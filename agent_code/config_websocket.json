@@ -1,0 +1,16 @@
+{
+  "callback_host": "ws://127.0.0.1",
+  "USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
+  "AESPSK": {
+    "value": "none",
+    "enc_key": null,
+    "dec_key": null
+  },
+  "callback_interval": "10",
+  "encrypted_exchange_check": "F",
+  "domain_front": "",
+  "ENDPOINT_REPLACE": "socket.io",
+  "callback_jitter": "37",
+  "callback_port": "10101",
+  "payload_uuid": "af095a8e-33bd-4ee1-a111-f1a3c6f5cdc4"
+}

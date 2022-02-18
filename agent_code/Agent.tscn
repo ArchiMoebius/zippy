@@ -1,0 +1,41 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://execute.gd" type="Script" id=1]
+[ext_resource path="res://api.gd" type="Script" id=2]
+[ext_resource path="res://config.gd" type="Script" id=3]
+[ext_resource path="res://uuid.gd" type="Script" id=4]
+[ext_resource path="res://tasking.gd" type="Script" id=5]
+[ext_resource path="res://checkin.gd" type="Script" id=6]
+[ext_resource path="res://Agent.gd" type="Script" id=7]
+[ext_resource path="res://CallbackTimer.gd" type="Script" id=8]
+
+[node name="Agent" type="Node"]
+script = ExtResource( 7 )
+
+[node name="execute" type="Node" parent="."]
+script = ExtResource( 1 )
+
+[node name="config" type="Node" parent="."]
+script = ExtResource( 3 )
+
+[node name="api" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="uuid" type="Node" parent="."]
+script = ExtResource( 4 )
+
+[node name="checkin" type="Node" parent="."]
+script = ExtResource( 6 )
+
+[node name="tasking" type="Node" parent="."]
+script = ExtResource( 5 )
+
+[node name="CallbackTimer" type="Timer" parent="."]
+script = ExtResource( 8 )
+
+[connection signal="checkin" from="." to="checkin" method="_on_Agent_checkin"]
+[connection signal="tasking" from="." to="tasking" method="_on_Agent_tasking"]
+[connection signal="agent_response" from="api" to="." method="_on_api_agent_response"]
+[connection signal="exit" from="tasking" to="." method="_on_tasking_exit"]
+[connection signal="whoami" from="tasking" to="execute" method="_on_tasking_whoami"]
+[connection signal="timeout" from="CallbackTimer" to="tasking" method="_on_CallbackTimer_timeout"]
