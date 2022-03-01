@@ -8,7 +8,7 @@ func _on_Agent_checkin(data):
 
 	if data.has("payload") and data.get("payload").has("id"):
 		$".".get_parent().get_node("config").set_callback_uuid(data.get("payload").get("id"))
-		$".".get_parent().get_node("api").checkin_done = true
+		$".".get_parent().get_node("api").checkin()
 		print("checking complete!")
 	else:
 		print("Checkin failed? ", data)

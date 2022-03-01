@@ -30,6 +30,9 @@ func _ready():
 	else:
 		printerr("No saved data!")
 
+func should_encrypt():
+	return false # TODO: implement
+
 func get_payload_uuid():
 
 	if setting.has("payload_uuid"):
@@ -53,8 +56,8 @@ func get_callback_wait_time():
 		callback_period = int(setting.get("callback_interval"))
 
 	if setting.has("callback_jitter"):
-		callback_jitter = float(int(setting.get("callback_jitter")) / 2)
-	
+		callback_jitter = float(float(setting.get("callback_jitter")) / 2.0)
+
 	if callback_jitter > callback_period:
 		callback_period = callback_jitter # TODO: can we do better than this?
 

