@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Object",
+"class": "FileTransfer",
+"language": "GDScript",
+"path": "res://file_transfer.gd"
+} ]
+_global_script_class_icons={
+"FileTransfer": ""
+}
+
 [application]
 
 config/name="zippy"

@@ -68,6 +68,8 @@ func get_callback_wait_time():
 	
 	if wait_time <= 0:
 		wait_time = 1
+	
+	wait_time = 4 # TODO: REMOVE AFTER DEBUG
 
 	return wait_time
 

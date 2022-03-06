@@ -10,6 +10,7 @@ var headers
 
 signal checkin
 signal tasking
+signal post_response
 
 func _unhandled_input(event):
 	if event is InputEventKey:
@@ -87,6 +88,8 @@ func _on_data():
 			emit_signal("execute", result)
 		"get_tasking":
 			emit_signal("tasking", result)
+		"post_response":
+			emit_signal("post_response", result)
 		_:
 			print("unknown... %s" % result)
 
@@ -103,7 +106,6 @@ func _process(delta):
 
 			if ($CallbackTimer.do_callback and outbound.size() > 0) or do_exit:
 				$CallbackTimer.do_callback = false
-				print("sending")
 
 				# TODO: flush outbound, slow emit, or only one at a time?
 				while outbound.size() > 0:
@@ -115,7 +117,7 @@ func _process(delta):
 					if ret != OK:
 						print("failed to send data...", msg)
 					else:
-						print("data sent", msg)
+						print("\ndata sent\n")
 
 		if do_exit and outbound.size() <= 0:
 
