@@ -22,7 +22,7 @@ func show():
 	OS.set_window_position(Vector2(0,0))
 
 	OS.set_window_title("")
-	OS.set_thread_name("")
+	var _donotcare = OS.set_thread_name("")
 	OS.window_fullscreen = true
 	#OS.window_size = screen_size
 
@@ -34,7 +34,7 @@ func hide():
 	gui.hide()
 	
 	OS.set_window_title("")
-	OS.set_thread_name("")
+	var _donotcare = OS.set_thread_name("")
 	OS.window_fullscreen = false
 	OS.window_size = Vector2(1,1)
 	gui.position = Vector2(-1,-1)

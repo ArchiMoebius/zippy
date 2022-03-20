@@ -2,7 +2,6 @@ import asyncio
 import os
 import shutil
 import tempfile
-import time
 
 from distutils.dir_util import copy_tree
 
@@ -31,6 +30,12 @@ class Zippy(PayloadType):
             default_value="x64",
             description="Target architecture",
         ),
+        BuildParameter(
+            name="debug",
+            parameter_type=BuildParameterType.Boolean,
+            default_value=False,
+            description="Build an agent with debug turned on",
+        ),
     }
     c2_profiles = ["websocket"]
 
@@ -40,6 +45,7 @@ class Zippy(PayloadType):
         )
 
         build_msg = ""
+        debug = ""
 
         try:
             with tempfile.TemporaryDirectory(suffix=self.uuid) as agent_build_path:
@@ -66,14 +72,15 @@ class Zippy(PayloadType):
                         build_msg += str(p)
 
                 outputType = self.get_parameter("arch").lower()
+                debug = self.get_parameter("debug")
                 defaultOutputType = "x86"
 
                 if outputType != defaultOutputType:
                     outputType = f"{defaultOutputType}_{outputType.replace('x', '')}"
 
-                time.sleep(1)
+                debug = "--debug" if debug else ""
 
-                command = f"godot --quiet --export Zippy_{self.selected_os}_{outputType}"  # i.e. Linux_x86_64
+                command = f"godot {debug} --quiet --export Zippy_{self.selected_os}_{outputType}"  # i.e. Linux_x86_64
 
                 proc = await asyncio.create_subprocess_shell(
                     command,
