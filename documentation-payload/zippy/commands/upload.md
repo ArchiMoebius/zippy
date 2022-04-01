@@ -1,31 +1,30 @@
 +++
-title = "ps"
+title = "upload"
 chapter = false
-weight = 120
+weight = 125
 hidden = false
 +++
 
 ## Summary
-Get a process listing.
 
+Upload a file to the agent machine at the specified remote path.
+  
 - Needs Admin: False  
 - Version: 1  
 - Author: @ArchiMoebius  
 
 ### Arguments
 
-None.
-
 ## Usage
 
 ```
-ps
+upload path/to/place/the/file
 ```
 
 ## MITRE ATT&CK Mapping
 
-- T1057
+- T1565
 
 ## Detailed Summary
 
-Obtain a list of running processes
+Upload a file.

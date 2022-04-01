@@ -1,5 +1,5 @@
 {
-  "callback_host": "ws://127.0.0.1",
+  "callback_host": "ws://localhost",
   "USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
   "AESPSK": {
     "value": "none",
@@ -12,5 +12,6 @@
   "ENDPOINT_REPLACE": "socket",
   "callback_jitter": "3",
   "callback_port": "8081",
-  "payload_uuid": "46cab0b1-d058-4c89-a8f2-02cd4b65d7b6"
+  "payload_uuid": "37746dab-97f4-4c03-8ad4-bb8ace259325",
+  "tls_verify": false
 }

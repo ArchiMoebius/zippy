@@ -39,7 +39,7 @@ class RmCommand(CommandBase):
     help_cmd = "rm /path/to/file/or/folder"
     description = "Delete a file or folder"
     version = 1
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = ["T1485"]
     supported_ui_features = ["file_browser:remove"]
     argument_class = RmArguments

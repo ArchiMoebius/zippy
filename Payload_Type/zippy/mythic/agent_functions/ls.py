@@ -40,7 +40,7 @@ class LsCommand(CommandBase):
     help_cmd = "ls [/path/to/folder/or/file]"
     description = "Get a file listing"
     version = 1
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = ["T1083"]
     supported_ui_features = ["file_browser:list"]
     is_file_browse = True

@@ -6,14 +6,16 @@ hidden = false
 +++
 
 ## Summary
+
 Exit the current session and kill the agent.
 
-  
 - Needs Admin: False  
 - Version: 1  
-- Author: @ArchiMoebius  
+- Author: @ArchiMoebius
 
 ### Arguments
+
+None.
 
 ## Usage
 

@@ -6,10 +6,11 @@ hidden = false
 +++
 
 ## Summary
+
 Delete a file.
   
-- Needs Admin: False  
-- Version: 1  
+- Needs Admin: maybe...
+- Version: 1
 - Author: @ArchiMoebius  
 
 ### Arguments
@@ -17,10 +18,10 @@ Delete a file.
 ## Usage
 
 ```
-rm [path]
+rm [path/to/a/file/or/a/folder]
 ```
 
 
 ## Detailed Summary
 
-Remove a file
+Remove the supplied file path or folder path.

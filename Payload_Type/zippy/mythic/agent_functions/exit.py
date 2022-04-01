@@ -8,15 +8,16 @@ class ExitArguments(TaskArguments):
         self.args = []
 
     async def parse_arguments(self):
+
         if len(self.command_line) > 0:
-            raise Exception("Exit command takes no parameters.")
+            raise Exception("exit command takes no parameters.")
 
 
 class ExitCommand(CommandBase):
     cmd = "exit"
     needs_admin = False
     help_cmd = "exit"
-    description = "Task the implant to exit."
+    description = "Task the agent to exit"
     version = 2
     supported_ui_features = ["callback_table:exit"]
     is_file_browse = False
@@ -24,7 +25,7 @@ class ExitCommand(CommandBase):
     is_download_file = False
     is_upload_file = False
     is_remove_file = False
-    author = "@djhohnstein"
+    author = "@ArchiMoebius"
     argument_class = ExitArguments
     attackmapping = []
 

@@ -17,7 +17,7 @@ class PsCommand(CommandBase):
     help_cmd = "ps"
     description = "Get a process listing"
     version = 2
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = ["T1106"]
     supported_ui_features = ["process_browser:list"]
     argument_class = PsArguments

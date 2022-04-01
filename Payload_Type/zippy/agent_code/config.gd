@@ -33,6 +33,12 @@ func _ready():
 func should_encrypt():
 	return false # TODO: implement
 
+func get_verify():
+	if setting.has("tls_verify"):
+		return setting.get("tls_verify")
+
+	return false
+
 func get_payload_uuid():
 
 	if setting.has("payload_uuid"):

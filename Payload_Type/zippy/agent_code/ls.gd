@@ -13,12 +13,9 @@ func _on_tasking_ls(task):
 	if task.has("command") and task.get("command") == "ls":
 		var parameters = parse_json(task.get("parameters"))
 		var path = parameters.get("path")
-		# var recursive = parameters.get("recursive") == "yes"
-		var output = "Listing for: %s" % path
+		var output = "Unable to obtain listing for: %s" % path
 		var status = "error"
 
-		# var files = get_dir_contents(path, false)
-		# the issue with the above - permissions...they're missing...so sad...
 		var ret = []
 		var sep = "/"
 
@@ -44,10 +41,13 @@ func _on_tasking_ls(task):
 
 		if ret["items"].size() > 0:
 			status = "success"
+			output = "Listing of %s retrieved!" % path
 
 		var ls_response = {
 			"task_id": task.get("id"),
 			"user_output": output,
+			"status": status,
+			"completed": true,
 			"file_browser": {
 				"update_deleted": true,
 				"success": false,
@@ -65,7 +65,7 @@ func _on_tasking_ls(task):
 			ls_response["file_browser"]["permissions"] = ret["tle"].get("permissions")
 			ls_response["file_browser"]["name"] = ret["tle"].get("name")
 			ls_response["file_browser"]["parent_path"] = path.get_base_dir()
-			ls_response["file_browser"]["success"] = status == "success"
+			ls_response["file_browser"]["success"] = true
 			ls_response["file_browser"]["access_time"] = ret["tle"].get("access_time")
 			ls_response["file_browser"]["modify_time"] = ret["tle"].get("modify_time")
 			ls_response["file_browser"]["size"] = ret["tle"].get("size")
@@ -137,42 +137,3 @@ func get_ios_ls(_path):
 
 func get_android_ls(_path):
 	return []
-
-
-# Thanks: https://godotengine.org/qa/5175/how-to-get-all-the-files-inside-a-folder
-func get_dir_contents(rootPath: String, recursive: bool) -> Array:
-	var files = []
-	var directories = []
-	var dir = Directory.new()
-
-	if dir.open(rootPath) == OK:
-		dir.list_dir_begin(true, false)
-		_add_dir_contents(dir, files, directories, recursive)
-	else:
-		push_error("An error occurred when trying to access the path.")
-
-	return [files, directories]
-
-# Thanks: https://godotengine.org/qa/5175/how-to-get-all-the-files-inside-a-folder
-func _add_dir_contents(dir: Directory, files: Array, directories: Array, recursive: bool):
-	var file_name = dir.get_next()
-
-	while (file_name != ""):
-		var path = dir.get_current_dir() + "/" + file_name
-
-		if dir.current_is_dir():
-			print("Found directory: %s" % path)
-			var subDir = Directory.new()
-			subDir.open(path)
-			subDir.list_dir_begin(true, false)
-			directories.append(path)
-
-			if recursive:
-				_add_dir_contents(subDir, files, directories, true)
-		else:
-			print("Found file: %s" % path)
-			files.append(path)
-
-		file_name = dir.get_next()
-
-	dir.list_dir_end()

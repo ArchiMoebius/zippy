@@ -7,8 +7,8 @@ hidden = false
 
 ## Summary
 Kill a process specified by PID.
-  
-- Needs Admin: False  
+
+- Needs Admin: maybe...
 - Version: 1  
 - Author: @ArchiMoebius  
 

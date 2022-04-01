@@ -61,7 +61,7 @@ func _on_tasking_shell(task):
 				exit_code == 0,
 				true,
 				task.get("id"),
-				output,
+				output[0],
 				[
 					[
 						"Process Create",
@@ -116,7 +116,7 @@ func _on_tasking_rm(task):
 		var ret = dir.remove(path)
 		var output = "Removed path: %s" % path
 		var status = "success"
-		
+
 		if ret != OK:
 			output = "Error (%d) removing path: %s" % [ret, path]
 			status = "error"

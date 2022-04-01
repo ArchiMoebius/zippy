@@ -1,5 +1,4 @@
 from mythic_payloadtype_container.MythicCommandBase import *
-import json
 
 
 class RansomArguments(TaskArguments):
@@ -23,7 +22,7 @@ class RansomCommand(CommandBase):
     is_download_file = False
     is_upload_file = False
     is_remove_file = False
-    author = "@djhohnstein"
+    author = "@ArchiMoebius"
     argument_class = RansomArguments
     attackmapping = []
 

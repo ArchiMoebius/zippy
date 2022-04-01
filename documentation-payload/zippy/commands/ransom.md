@@ -1,31 +1,28 @@
 +++
-title = "ps"
+title = "ransom"
 chapter = false
-weight = 120
+weight = 122
 hidden = false
 +++
 
 ## Summary
-Get a process listing.
-
+Delete a file.
+  
 - Needs Admin: False  
 - Version: 1  
 - Author: @ArchiMoebius  
 
 ### Arguments
 
-None.
+None
 
 ## Usage
 
 ```
-ps
+ransom
 ```
 
-## MITRE ATT&CK Mapping
-
-- T1057
 
 ## Detailed Summary
 
-Obtain a list of running processes
+The 'ransom' command will show a screen on the enduser's screen (assumes GUI) requesting information from them.

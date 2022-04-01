@@ -1,13 +1,14 @@
 +++
-title = "ps"
+title = "whoami"
 chapter = false
-weight = 120
+weight = 125
 hidden = false
 +++
 
 ## Summary
-Get a process listing.
 
+Execute the whoami command if found on path
+  
 - Needs Admin: False  
 - Version: 1  
 - Author: @ArchiMoebius  
@@ -19,13 +20,12 @@ None.
 ## Usage
 
 ```
-ps
+whoami
 ```
 
 ## MITRE ATT&CK Mapping
 
-- T1057
-
+- T1059  
 ## Detailed Summary
 
-Obtain a list of running processes
+Execute the whoami command

@@ -9,7 +9,7 @@ class KillArguments(TaskArguments):
             CommandParameter(
                 name="pid",
                 type=ParameterType.Number,
-                description="ID of Process to Terminate",
+                description="ID of process to attempt termination of",
             )
         ]
 
@@ -26,9 +26,9 @@ class KillCommand(CommandBase):
     cmd = "kill"
     needs_admin = False
     help_cmd = "kill pid"
-    description = "Terminate process by ID"
+    description = "Attempt to terminate a process by ID"
     version = 1
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = []
     supported_ui_features = ["process_browser:kill"]
     argument_class = KillArguments
@@ -38,7 +38,7 @@ class KillCommand(CommandBase):
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         task.display_params = (
-            f'Terminating process with PID: {str(task.args.get_arg("pid"))}'
+            f'Attempting to terminate process with PID: {str(task.args.get_arg("pid"))}'
         )
 
         return task

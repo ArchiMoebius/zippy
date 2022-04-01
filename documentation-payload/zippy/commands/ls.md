@@ -6,18 +6,20 @@ hidden = false
 +++
 
 ## Summary
-List directory.
+List directory or file
 
-- Needs Admin: False  
+- Needs Admin: maybe...
 - Version: 1  
 - Author: @ArchiMoebius  
 
 ### Arguments
 
+None.
+
 ## Usage
 
 ```
-ls [directory]
+ls /home/
 ```
 
 ## MITRE ATT&CK Mapping

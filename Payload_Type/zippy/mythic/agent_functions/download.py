@@ -13,7 +13,7 @@ class DownloadArguments(TaskArguments):
     async def parse_arguments(self):
         if len(self.command_line.strip()) == 0:
             raise Exception(
-                "Require a path to download.\n\tUsage: {}".format(
+                "command requires a path to a file for download from agent machine.\n\tUsage: {}".format(
                     DownloadCommand.help_cmd
                 )
             )
@@ -38,14 +38,12 @@ class DownloadArguments(TaskArguments):
 class DownloadCommand(CommandBase):
     cmd = "download"
     needs_admin = False
-    help_cmd = "download {filepath} ... {filepath}"
-    description = (
-        "Download one or more a files from the victim machine - parsed as POSIX paths"
-    )
+    help_cmd = "download /etc/passwd"
+    description = "Download a file from the victim machine - parsed as POSIX paths"
     version = 1
     supported_ui_features = ["file_browser:download"]
     is_download_file = True
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     parameters = []
     attackmapping = ["T1020", "T1030", "T1041"]
     argument_class = DownloadArguments

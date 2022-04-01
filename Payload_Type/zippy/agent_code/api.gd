@@ -166,9 +166,6 @@ func create_task_response(status, completed, task_id, output, artifacts = [], cr
 		"completed": completed,
 	}
 
-	if credentials.size() > 0:
-		task_response["credentials"] = credentials
-	
 	if artifacts.size() > 0:
 		task_response["artifacts"] = []
 
@@ -179,10 +176,13 @@ func create_task_response(status, completed, task_id, output, artifacts = [], cr
 			entry["artifact"] = artifact[1]
 			task_response["artifacts"].append(entry)
 
+	if credentials.size() > 0:
+		task_response["credentials"] = credentials
+
 	for response in unkeyed_payloads:
 		payload["responses"].append(response)
 
-	if credentials.size() > 0 or artifacts.size() > 0: # damn mythic...it'd be nice if you used a key for files...or didn't for these...be consistent ffs!
+	if unkeyed_payloads.size() <= 0:
 
 		if status:
 			task_response["status"] = "success"

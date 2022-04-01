@@ -36,6 +36,12 @@ class Zippy(PayloadType):
             default_value=False,
             description="Build an agent with debug turned on",
         ),
+        BuildParameter(
+            name="tls_verify",
+            parameter_type=BuildParameterType.Boolean,
+            default_value=False,
+            description="Enable TLS certificate verification",
+        ),
     }
     c2_profiles = ["websocket"]
 
@@ -63,6 +69,7 @@ class Zippy(PayloadType):
                             c2_config = c2.get_parameters_dict()
 
                             c2_config["payload_uuid"] = self.uuid
+                            c2_config["tls_verify"] = self.get_parameter("tls_verify")
 
                             build_msg += json.dumps(c2_config, indent=2)
 

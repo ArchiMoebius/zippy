@@ -8,16 +8,16 @@ hidden = false
 ## Summary
 Download a file from the target.
   
-- Needs Admin: False  
+- Needs Admin: maybe...
 - Version: 1  
-- Author: @ArchiMoebius  
+- Author: @ArchiMoebius
 
 ### Arguments
 
 ## Usage
 
 ```
-download {path to remote file}
+download {path to file on agent machine}
 ```
 
 ## MITRE ATT&CK Mapping
@@ -27,4 +27,4 @@ download {path to remote file}
 - T1041  
 ## Detailed Summary
 
-Download a file from the remote host in chunks. Download is a non-blocking command
+Download a file from the remote host in chunks. Download is a non-blocking command.

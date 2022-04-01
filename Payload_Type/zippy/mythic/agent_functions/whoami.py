@@ -3,7 +3,6 @@ import json
 
 
 class WhoamiArguments(TaskArguments):
-
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = []
@@ -26,9 +25,12 @@ class WhoamiCommand(CommandBase):
     is_download_file = False
     is_upload_file = False
     is_remove_file = False
-    author = "@djhohnstein"
+    author = "@ArchiMoebius"
     argument_class = WhoamiArguments
     attackmapping = ["T1033"]
+    attributes = CommandAttributes(
+        supported_os=[SupportedOS.MacOS, SupportedOS.Linux],
+    )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         return task
