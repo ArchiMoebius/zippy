@@ -4,7 +4,7 @@
   <img alt="Zippy Logo" src="documentation-payload/zippy/zippy.svg" height="30%" width="30%">
 </p>
 
-Zippy is an agent that compiles into Linux, MacOS, and Windows executables.
+Zippy is an agent that compiles into Linux, MacOS, and Windows executables. It's an "IT training tool" - not ransomware.
 
 It leverages the [Godot](godotengine.org/) to cross compile for the supported operating systems. This Zippy instance supports Mythic 2.3 and will be updated as necessary. It does not support Mythic 2.2 and lower.
 
@@ -20,8 +20,8 @@ TODO
 
 When it's time for you to test out your install or for another user to install your agent, it's pretty simple. Within Mythic you can run the `mythic-cli` binary to install this in one of three ways:
 
-* `sudo ./mythic-cli install github https://github.com/user/repo` to install the main branch
-* `sudo ./mythic-cli install github https://github.com/user/repo branchname` to install a specific branch of that repo
+* `sudo ./mythic-cli install github https://github.com/ArchiMoebius/zippy` to install the main branch
+* `sudo ./mythic-cli install github https://github.com/ArchiMoebius/zippy main` to install a specific branch of that repo
 * `sudo ./mythic-cli install folder /path/to/local/folder/cloned/from/github` to install from an already cloned down version of an agent repo
 
 Now, you might be wondering _when_ should you or a user do this to properly add your agent to their Mythic instance. There's no wrong answer here, just depends on your preference. The three options are:
@@ -37,5 +37,9 @@ View the rendered documentation by clicking on **Docs -> Agent Documentation** i
 interface. 
 
 ## Building Outside of Mythic
+
+TODO
+
+## Developing
 
 TODO
