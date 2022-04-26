@@ -20,7 +20,7 @@ class Zippy(PayloadType):
     version = "2.1.0"
     wrapper = False
     wrapped_payloads = []
-    note = """Any note you want to show up about your payload type in the UI"""
+    note = """Currently - only Linux support - and not on a headless display - requires opengl!"""
     supports_dynamic_loading = False  # setting this to True allows users to only select a subset of commands when generating a payload
     build_parameters = {
         BuildParameter(
@@ -103,8 +103,10 @@ class Zippy(PayloadType):
                 if stderr:
                     build_msg += f"[stderr]\n{stderr.decode()}" + "\n" + command
 
+                built_file_extension = 'exe' if self.selected_os.lower() == 'windows' else 'elf'
+
                 with open(
-                    f"{agent_build_path}/build/zippy_{self.selected_os.lower()}.{outputType}",
+                    f"{agent_build_path}/build/zippy_{self.selected_os.lower()}_{outputType}.{built_file_extension}",
                     "rb",
                 ) as fh:
                     resp.payload = fh.read()
