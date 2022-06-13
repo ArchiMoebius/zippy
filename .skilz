@@ -1,0 +1,11 @@
+{
+	"branch": "main",
+  "description": "Zippy is a Godot agent that compiles into Linux, MacOS, and Windows executables. It's an "IT training tool" - not ransomware.",
+  "title": "Zippy",
+  "links": [
+    {
+      "title": "View Source",
+      "href": "https://github.com/ArchiMoebius/zippy/"
+    }
+  ]
+}
